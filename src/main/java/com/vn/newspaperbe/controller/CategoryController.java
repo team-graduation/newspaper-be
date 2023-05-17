@@ -11,7 +11,7 @@ import java.util.Optional;
 
 @RestController
 @CrossOrigin("*")
-@RequestMapping("/categories")
+@RequestMapping("/api/categories")
 public class CategoryController {
     @Autowired
     private ICategoryService categoryService;
@@ -27,26 +27,26 @@ public class CategoryController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Category> getCategory(@PathVariable Long id) {
+    public ResponseEntity<Category> getCategory(@PathVariable Integer id) {
         Optional<Category> categoryOptional = categoryService.findById(id);
         return categoryOptional.map(category -> new ResponseEntity<>(category, HttpStatus.OK))
                 .orElseGet(() -> new ResponseEntity<>(HttpStatus.NOT_FOUND));
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Category> updateCategory(@PathVariable Long id, @RequestBody Category category) {
+    public ResponseEntity<Category> updateCategory(@PathVariable Integer id, @RequestBody Category category) {
         Optional<Category> categoryOptional = categoryService.findById(id);
         return categoryOptional.map(category1 -> {
-            category.setId(category1.getId());
+            category.setCategoryId(category1.getCategoryId());
             return new ResponseEntity<>(categoryService.save(category), HttpStatus.OK);
         }).orElseGet(() -> new ResponseEntity<>(HttpStatus.NOT_FOUND));
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Category> deleteCategory(@PathVariable Long id) {
+    public ResponseEntity<Category> deleteCategory(@PathVariable Integer id) {
         Optional<Category> categoryOptional = categoryService.findById(id);
         return categoryOptional.map(category -> {
-            categoryService.remove(id);
+            categoryService.delete(id);
             return new ResponseEntity<>(category, HttpStatus.OK);
         }).orElseGet(() -> new ResponseEntity<>(HttpStatus.NOT_FOUND));
     }

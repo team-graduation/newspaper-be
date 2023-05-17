@@ -1,7 +1,8 @@
-package com.vn.newspaperbe.service;
+package com.vn.newspaperbe.service.impl;
 
 import com.vn.newspaperbe.entity.Category;
 import com.vn.newspaperbe.repository.ICategoryRepository;
+import com.vn.newspaperbe.service.ICategoryService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -18,7 +19,7 @@ public class CategoryService implements ICategoryService {
     }
 
     @Override
-    public Optional<Category> findById(Long id) {
+    public Optional<Category> findById(Integer id) {
         return categoryRepository.findById(id);
     }
 
@@ -28,7 +29,7 @@ public class CategoryService implements ICategoryService {
     }
 
     @Override
-    public void remove(Long id) {
+    public void delete(Integer id) {
         categoryRepository.deleteById(id);
     }
 }

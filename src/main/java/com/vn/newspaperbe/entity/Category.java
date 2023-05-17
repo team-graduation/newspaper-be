@@ -1,29 +1,39 @@
 package com.vn.newspaperbe.entity;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import lombok.Data;
-
-import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.persistence.CascadeType;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.OneToMany;
+import javax.persistence.Table;
+
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
+
 @Entity
-@Data
+@Table(name = "categories")
+@Getter
+@Setter
+@NoArgsConstructor
 public class Category {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	private Integer categoryId;
 
-//    @OneToMany(fetch = FetchType.LAZY, mappedBy = "category")
-//    private List<News> news;
+	@Column(name="title",length=100,nullable=false)
+	private String categoryTitle;
 
-//    @OneToMany(cascade = CascadeType.ALL)
-//    @JoinColumn(name = "fk_category_id", referencedColumnName = "id")
-//    private List<News> news;
+	@Column(name="description")
+	private String categoryDescription;
 
-    @JsonIgnore
-    @OneToMany(mappedBy = "categories")
-    private List<News> newsList = new ArrayList<>();
-
-    private String name;
+//	@OneToMany(mappedBy = "category", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+//	private List<News> posts = new ArrayList<>();
 }
