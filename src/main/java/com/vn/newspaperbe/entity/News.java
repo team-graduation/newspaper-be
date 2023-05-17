@@ -28,6 +28,8 @@ public class News
     @Column(columnDefinition = "TEXT", nullable=false)
     private String content;
 
+    @Lob
+    @Column(columnDefinition = "TEXT")
     private String summarization;
 
     private String imageName;
@@ -41,7 +43,7 @@ public class News
     private Category category;
 
     @ManyToOne
-    private User user;
+    private DAOUser user;
 
     @OneToMany(mappedBy = "news", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Comment> comments = new ArrayList<>();
