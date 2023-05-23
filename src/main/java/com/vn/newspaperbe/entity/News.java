@@ -24,6 +24,8 @@ public class News
     @Column(nullable=false)
     private String title;
 
+    private String language;
+
     @Lob
     @Column(columnDefinition = "TEXT", nullable=false)
     private String content;
