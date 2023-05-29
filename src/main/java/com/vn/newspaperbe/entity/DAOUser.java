@@ -20,15 +20,17 @@ public class DAOUser {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long id;
+    private Integer id;
     @Column
     private String username;
     @Column
     @JsonIgnore
     private String password;
 
+    @Column
     private String email;
 
+    @Column
     private String about;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)

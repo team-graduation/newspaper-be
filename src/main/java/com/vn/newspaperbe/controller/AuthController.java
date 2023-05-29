@@ -1,9 +1,12 @@
 package com.vn.newspaperbe.controller;
 
 import com.vn.newspaperbe.config.JwtTokenUtil;
+import com.vn.newspaperbe.entity.DAOUser;
 import com.vn.newspaperbe.payloads.JwtRequest;
 import com.vn.newspaperbe.payloads.JwtResponse;
 import com.vn.newspaperbe.payloads.UserDTO;
+import com.vn.newspaperbe.service.INewsService;
+import com.vn.newspaperbe.service.IUserService;
 import com.vn.newspaperbe.service.impl.JwtUserDetailsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -13,6 +16,8 @@ import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.Hashtable;
 
 @RestController
 @CrossOrigin
@@ -27,6 +32,9 @@ public class AuthController {
     @Autowired
     private JwtUserDetailsService userDetailsService;
 
+    @Autowired
+    private IUserService iUserService;
+
     @RequestMapping(value = "/register", method = RequestMethod.POST)
     public ResponseEntity<?> saveUser(@RequestBody UserDTO user) throws Exception {
         return ResponseEntity.ok(userDetailsService.save(user));
@@ -40,8 +48,11 @@ public class AuthController {
                 .loadUserByUsername(authenticationRequest.getUsername());
 
         final String token = jwtTokenUtil.generateToken(userDetails);
-
-        return ResponseEntity.ok(new JwtResponse(token));
+        final UserDTO userDTO = this.iUserService.getUserByUsername(authenticationRequest.getUsername());
+        Hashtable<String, Object> result = new Hashtable<String, Object>();
+        result.put("info",userDTO);
+        result.put("token",new JwtResponse(token).getToken());
+        return ResponseEntity.ok(result);
     }
 
 
