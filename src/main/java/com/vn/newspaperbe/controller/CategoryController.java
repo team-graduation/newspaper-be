@@ -1,12 +1,15 @@
 package com.vn.newspaperbe.controller;
 
 import com.vn.newspaperbe.entity.Category;
+import com.vn.newspaperbe.payloads.CategoryDTO;
+import com.vn.newspaperbe.payloads.NewsDTO;
 import com.vn.newspaperbe.service.ICategoryService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.Optional;
 
 @RestController
@@ -21,9 +24,15 @@ public class CategoryController {
         return new ResponseEntity<>(categoryService.save(category), HttpStatus.OK);
     }
 
+//    @GetMapping
+//    public ResponseEntity<Iterable<Category>> getAllCategory() {
+//        return new ResponseEntity<>(categoryService.findAll(), HttpStatus.OK);
+//    }
+
     @GetMapping
-    public ResponseEntity<Iterable<Category>> getAllCategory() {
-        return new ResponseEntity<>(categoryService.findAll(), HttpStatus.OK);
+    public ResponseEntity<List<CategoryDTO>> getAllCategory() {
+        List<CategoryDTO> categories = this.categoryService.getAllCategories();
+        return new ResponseEntity<List<CategoryDTO>>(categories,HttpStatus.OK);
     }
 
     @GetMapping("/{id}")
