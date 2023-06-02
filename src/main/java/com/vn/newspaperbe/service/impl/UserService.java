@@ -61,6 +61,12 @@ public class UserService implements IUserService {
         return this.modelMapper.map(user, UserDTO.class);
     }
 
+    @Override
+    public UserDTO getUserById(Integer id) {
+        DAOUser user = this.iUserRepository.findDAOUserById(id);
+        return this.modelMapper.map(user, UserDTO.class);
+    }
+
     //    @Override
 //    public UserDTO findByUsername(String username) {
 //        return null;

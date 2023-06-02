@@ -118,9 +118,11 @@ public class NewsService implements INewsService {
 
     @Override
     public List<NewsDTO> getNewsByUsers(Integer userId) {
-        DAOUser user = this.iUserRepository.findById(userId).orElseThrow(() -> new ResourceNotFoundException("User", "Id", userId));
+//        DAOUser user = this.iUserRepository.findById(userId).orElseThrow(() -> new ResourceNotFoundException("User", "Id", userId));
 
-        List<News> news = this.iNewsRepository.findNewsByUser(user);
+        List<News> news = this.iNewsRepository.findNewsByUser(
+                iUserRepository.findDAOUserById(userId)
+        );
         List<NewsDTO> newsDTOS = news.stream().map((p) -> this.modelMapper.map(p, NewsDTO.class)).collect(Collectors.toList());
 
         return newsDTOS;
