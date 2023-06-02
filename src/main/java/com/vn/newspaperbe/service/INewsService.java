@@ -12,5 +12,9 @@ public interface INewsService extends IGeneralService<News>{
 
     List<NewsDTO> getAllNews();
 
+    List<NewsDTO> getNewsByCategory(Integer categoryId);
+
+    List<NewsDTO> getNewsByUsers(Integer userId);
+
     NewsDTO getNewsById(Integer newsId);
 }

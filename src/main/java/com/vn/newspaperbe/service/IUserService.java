@@ -6,4 +6,5 @@ public interface IUserService extends IGeneralService<DAOUser> {
 //    UserDTO getUserByName(String name);
     UserDTO getUserByUsername(String username);
 
+
 }

@@ -12,12 +12,9 @@ import com.vn.newspaperbe.repository.INewsRepository;
 import com.vn.newspaperbe.repository.IUserRepository;
 import com.vn.newspaperbe.service.INewsService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Configuration;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.modelmapper.ModelMapper;
-import org.springframework.web.client.RestTemplate;
-import org.springframework.http.*;
 import org.springframework.web.client.RestTemplate;
 
 import java.io.IOException;
@@ -65,6 +62,7 @@ public class NewsService implements INewsService {
     static int classifyValue = 0;
     static String summaryValue = "";
     static String sentimentValue = "";
+
     @Override
     public NewsDTO createNews(NewsDTO newsDTO, Integer userId) {
         DAOUser user = this.iUserRepository.findById(userId).orElseThrow(() -> new ResourceNotFoundException("User", "Id", userId));
@@ -106,6 +104,25 @@ public class NewsService implements INewsService {
     public List<NewsDTO> getAllNews() {
         List<News> news = this.iNewsRepository.findAll();
         List<NewsDTO> newsDTOS = news.stream().map((p) -> this.modelMapper.map(p, NewsDTO.class)).collect(Collectors.toList());
+        return newsDTOS;
+    }
+
+    @Override
+    public List<NewsDTO> getNewsByCategory(Integer categoryId) {
+        List<News> news = this.iNewsRepository.findNewsByCategory(
+                iCategoryRepository.findByCategoryId(categoryId)
+        );
+        List<NewsDTO> newsDTOS = news.stream().map((p) -> this.modelMapper.map(p, NewsDTO.class)).collect(Collectors.toList());
+        return newsDTOS;
+    }
+
+    @Override
+    public List<NewsDTO> getNewsByUsers(Integer userId) {
+        DAOUser user = this.iUserRepository.findById(userId).orElseThrow(() -> new ResourceNotFoundException("User", "Id", userId));
+
+        List<News> news = this.iNewsRepository.findNewsByUser(user);
+        List<NewsDTO> newsDTOS = news.stream().map((p) -> this.modelMapper.map(p, NewsDTO.class)).collect(Collectors.toList());
+
         return newsDTOS;
     }
 

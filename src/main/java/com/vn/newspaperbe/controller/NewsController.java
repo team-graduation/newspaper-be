@@ -6,7 +6,6 @@ import com.vn.newspaperbe.service.INewsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -48,6 +47,22 @@ public class NewsController {
     {
         NewsDTO news = this.iNewsService.getNewsById(newsId);
         return new ResponseEntity<NewsDTO>(news,HttpStatus.OK);
+    }
+
+    //Get news by category
+    @GetMapping("/news/category/{categoryId}")
+    public ResponseEntity<List<NewsDTO>> getNewsByCategory(@PathVariable Integer categoryId)
+    {
+        List<NewsDTO> news = this.iNewsService.getNewsByCategory(categoryId);
+        return new ResponseEntity<List<NewsDTO>>(news,HttpStatus.OK);
+    }
+
+    //Get news by user
+    @GetMapping("/user/{userId}/news")
+    public ResponseEntity<List<NewsDTO>> getNewsByUser(@PathVariable Integer userId)
+    {
+        List<NewsDTO> news = this.iNewsService.getNewsByUsers(userId);
+        return new ResponseEntity<List<NewsDTO>>(news,HttpStatus.OK);
     }
 
     //Delete news
