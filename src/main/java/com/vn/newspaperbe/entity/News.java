@@ -36,6 +36,8 @@ public class News
 
     private String imageName;
 
+    private String sentiment;
+
     private Date addedDate;
 
     private boolean status;

@@ -64,6 +64,7 @@ public class NewsService implements INewsService {
 
     static int classifyValue = 0;
     static String summaryValue = "";
+    static String sentimentValue = "";
     @Override
     public NewsDTO createNews(NewsDTO newsDTO, Integer userId) {
         DAOUser user = this.iUserRepository.findById(userId).orElseThrow(() -> new ResourceNotFoundException("User", "Id", userId));
@@ -77,9 +78,10 @@ public class NewsService implements INewsService {
             sendText(news.getContent());
             news.setCategory(iCategoryRepository.findByCategoryId(classifyValue));
             news.setSummarization(summaryValue);
+            news.setSentiment(sentimentValue);
 
-        } catch (IOException e) {
-            throw new RuntimeException(e);
+        } catch (Exception e) {
+            System.out.println(e);
         }
 
 
@@ -130,6 +132,7 @@ public class NewsService implements INewsService {
             JsonNode jsonNode = objectMapper.readTree(jsonString);
             classifyValue = jsonNode.get("classify").asInt();
             summaryValue = jsonNode.get("summary").asText();
+            sentimentValue = jsonNode.get("sentiment").asText();
             System.out.println(classifyValue);
             System.out.println(summaryValue);
         } else {
