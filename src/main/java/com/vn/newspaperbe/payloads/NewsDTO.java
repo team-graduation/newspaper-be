@@ -23,7 +23,9 @@ public class NewsDTO {
 
     private String summarization;
 
-    private String imageName;
+    private String image;
+
+    private String thumbnail;
 
     private Date addedDate;
 
@@ -33,5 +35,5 @@ public class NewsDTO {
 
     private UserDTO user;
 
-    private List<Comment> comments = new ArrayList<>();
+    private List<CommentDTO> comments = new ArrayList<>();
 }

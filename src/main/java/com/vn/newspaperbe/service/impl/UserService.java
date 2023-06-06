@@ -13,7 +13,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class UserService implements IUserService {
@@ -25,7 +27,14 @@ public class UserService implements IUserService {
     private ModelMapper modelMapper;
 
     @Override
-    public Iterable findAll() {
+    public List<UserDTO> getAllUsers() {
+        List<DAOUser> users = this.iUserRepository.findAll();
+        List<UserDTO> userDTOS = users.stream().map((p) -> this.modelMapper.map(p, UserDTO.class)).collect(Collectors.toList());
+        return userDTOS;
+    }
+
+    @Override
+    public Iterable<DAOUser> findAll() {
         return null;
     }
 

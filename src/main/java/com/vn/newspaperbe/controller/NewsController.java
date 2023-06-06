@@ -1,5 +1,6 @@
 package com.vn.newspaperbe.controller;
 
+import com.vn.newspaperbe.entity.Category;
 import com.vn.newspaperbe.payloads.ApiResponse;
 import com.vn.newspaperbe.payloads.NewsDTO;
 import com.vn.newspaperbe.service.INewsService;
@@ -8,6 +9,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Date;
 import java.util.List;
 
 @RestController
@@ -50,12 +52,12 @@ public class NewsController {
     }
 
     //Get news by category
-    @GetMapping("/news/category/{categoryId}")
-    public ResponseEntity<List<NewsDTO>> getNewsByCategory(@PathVariable Integer categoryId)
-    {
-        List<NewsDTO> news = this.iNewsService.getNewsByCategory(categoryId);
-        return new ResponseEntity<List<NewsDTO>>(news,HttpStatus.OK);
-    }
+//    @GetMapping("/news/category/{categoryId}")
+//    public ResponseEntity<List<NewsDTO>> getNewsByCategory(@PathVariable Integer categoryId)
+//    {
+//        List<NewsDTO> news = this.iNewsService.getNewsByCategory(categoryId);
+//        return new ResponseEntity<List<NewsDTO>>(news,HttpStatus.OK);
+//    }
 
     //Get news by user
     @GetMapping("/user/{userId}/news")
@@ -65,6 +67,12 @@ public class NewsController {
         return new ResponseEntity<List<NewsDTO>>(news,HttpStatus.OK);
     }
 
+//    @GetMapping("/addDate}")
+//    public ResponseEntity<List<NewsDTO>> findNewsByAddedDate(){
+//        List<NewsDTO> news = this.iNewsService.findNewsByAddedDate();
+//        return new ResponseEntity<List<NewsDTO>>(news,HttpStatus.OK);
+//    }
+
     //Delete news
 //    @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/news/{newsId}")
@@ -72,6 +80,13 @@ public class NewsController {
     {
         iNewsService.delete(newsId);
         return new ResponseEntity<ApiResponse>(new ApiResponse("News deleted successfully",true),HttpStatus.OK);
+    }
+
+    @GetMapping("/news/search/{title}")
+    public ResponseEntity<List<NewsDTO>> searchNewsByTitle(@PathVariable("title") String title)
+    {
+        List<NewsDTO> result = this.iNewsService.searchNews(title);
+        return new ResponseEntity<List<NewsDTO>>(result,HttpStatus.OK);
     }
 
 }

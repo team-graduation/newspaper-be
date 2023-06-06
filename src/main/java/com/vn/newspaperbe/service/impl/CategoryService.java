@@ -23,7 +23,7 @@ public class CategoryService implements ICategoryService {
     private ModelMapper modelMapper;
 
     @Override
-    public Iterable<Category> findAll() {
+    public List<Category> findAll() {
         return categoryRepository.findAll();
     }
 

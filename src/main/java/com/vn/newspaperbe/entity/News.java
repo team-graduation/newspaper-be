@@ -34,7 +34,9 @@ public class News
     @Column(columnDefinition = "TEXT")
     private String summarization;
 
-    private String imageName;
+    private String image;
+
+    private String thumbnail;
 
     private String sentiment;
 

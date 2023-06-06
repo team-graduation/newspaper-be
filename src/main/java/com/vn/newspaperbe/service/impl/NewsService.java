@@ -39,7 +39,7 @@ public class NewsService implements INewsService {
     private ICategoryRepository iCategoryRepository;
 
     @Override
-    public Iterable<News> findAll() {
+    public List<News> findAll() {
         return null;
     }
 
@@ -68,7 +68,7 @@ public class NewsService implements INewsService {
         DAOUser user = this.iUserRepository.findById(userId).orElseThrow(() -> new ResourceNotFoundException("User", "Id", userId));
 
         News news = this.modelMapper.map(newsDTO, News.class);
-        news.setImageName("default.png");
+        news.setImage("default.png");
         news.setAddedDate(new Date());
         news.setUser(user);
 
@@ -82,9 +82,7 @@ public class NewsService implements INewsService {
             System.out.println(e);
         }
 
-
         News savedNews = this.iNewsRepository.save(news);
-
         return this.modelMapper.map(news, NewsDTO.class);
     }
 
@@ -93,7 +91,7 @@ public class NewsService implements INewsService {
         News news = this.iNewsRepository.findById(newsId).orElseThrow(() -> new ResourceNotFoundException("News", "Id", newsId));
         news.setTitle(newsDTO.getTitle());
         news.setContent(newsDTO.getContent());
-        news.setImageName(newsDTO.getImageName());
+        news.setImage(newsDTO.getImage());
 
         News updatedPost = iNewsRepository.save(news);
 
@@ -108,9 +106,10 @@ public class NewsService implements INewsService {
     }
 
     @Override
-    public List<NewsDTO> getNewsByCategory(Integer categoryId) {
+    public List<NewsDTO> getNewsByCategory(Category category) {
         List<News> news = this.iNewsRepository.findNewsByCategory(
-                iCategoryRepository.findByCategoryId(categoryId)
+                category
+//                iCategoryRepository.findByCategoryId(categoryId)
         );
         List<NewsDTO> newsDTOS = news.stream().map((p) -> this.modelMapper.map(p, NewsDTO.class)).collect(Collectors.toList());
         return newsDTOS;
@@ -132,9 +131,16 @@ public class NewsService implements INewsService {
         return this.modelMapper.map(news, NewsDTO.class);
     }
 
+    @Override
+    public List<NewsDTO> searchNews(String title) {
+        List<News> news = this.iNewsRepository.findNewsByTitle(title);
+        List<NewsDTO> newsDTOS = news.stream().map((p) -> this.modelMapper.map(p, NewsDTO.class)).collect(Collectors.toList());
+        return newsDTOS;
+    }
+
     public static void sendText(String t) throws IOException {
         RestTemplate restTemplate = new RestTemplate();
-        String apiUrl = "http://localhost:5555/api/receive-text";
+        String apiUrl = "http://157.245.192.252/api/receive-text";
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
         String requestBody = t;
