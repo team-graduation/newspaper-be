@@ -17,11 +17,12 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Date;
+import java.time.LocalDate;
+import java.sql.Date;
 import java.util.List;
 
 @RestController
-@CrossOrigin("*")
+@CrossOrigin(origins = "*", allowedHeaders = "*")
 @RequestMapping("/api/auth")
 public class NewsController {
 
@@ -29,30 +30,44 @@ public class NewsController {
     private INewsService iNewsService;
 
     //Create news
-    @PostMapping("/user/{userId}/news")
-    public ResponseEntity<NewsDTO> createNews(@RequestBody NewsDTO newsDTO, @PathVariable Integer userId) {
-        NewsDTO savedNews = this.iNewsService.createNews(newsDTO, userId);
-        return new ResponseEntity<NewsDTO>(savedNews, HttpStatus.CREATED);
-    }
+//    @PostMapping("/user/{userId}/dh-news")
+//    public ResponseEntity<NewsDTO> createDhNews(@RequestParam("image_thumbnail") MultipartFile image_thumbnail,
+//                                                @RequestParam("title") String title,
+//                                                @RequestParam("content") String content,
+//                                                @PathVariable Integer userId) {
+//        String thumbnail = saveImage(image_thumbnail);
+//        NewsDTO newsDTO = new NewsDTO();
+//        newsDTO.setTitle(title);
+//        newsDTO.setThumbnail(thumbnail);
+//        newsDTO.setContent(content);
+//        NewsDTO savedNews = this.iNewsService.createNews(newsDTO, userId);
+//        return new ResponseEntity<NewsDTO>(savedNews, HttpStatus.CREATED);
+//    }
 
-    @PostMapping("/user/{userId}/dh-news")
-    public ResponseEntity<NewsDTO> createDhNews(@RequestParam("image_thumbnail") MultipartFile image_thumbnail,
+    @PostMapping("/news/add")
+    public ResponseEntity<NewsDTO> createNewsTest(@RequestParam("thumbnail") MultipartFile thumbnail,
                                                 @RequestParam("title") String title,
-                                                @RequestParam("content") String content,
-                                                @PathVariable Integer userId) {
-        String thumbnail = saveImage(image_thumbnail);
+                                                @RequestParam("content") String content) {
+        String thumbnailImage = saveImage(thumbnail);
         NewsDTO newsDTO = new NewsDTO();
         newsDTO.setTitle(title);
-        newsDTO.setThumbnail(thumbnail);
+        newsDTO.setThumbnail(thumbnailImage);
         newsDTO.setContent(content);
-        NewsDTO savedNews = this.iNewsService.createNews(newsDTO, userId);
+        NewsDTO savedNews = this.iNewsService.createNews(newsDTO);
         return new ResponseEntity<NewsDTO>(savedNews, HttpStatus.CREATED);
     }
 
 
     //Update news
     @PutMapping("/news/{newsId}")
-    public ResponseEntity<NewsDTO> updateNews(@RequestBody NewsDTO newsDTO, @PathVariable Integer newsId) {
+    public ResponseEntity<NewsDTO> updateNews(@RequestParam("thumbnail") MultipartFile thumbnail,
+                                              @RequestParam("title") String title,
+                                              @RequestParam("content") String content, @PathVariable Integer newsId) {
+        String thumbnailImage = saveImage(thumbnail);
+        NewsDTO newsDTO = new NewsDTO();
+        newsDTO.setTitle(title);
+        newsDTO.setThumbnail(thumbnailImage);
+        newsDTO.setContent(content);
         NewsDTO news = iNewsService.updateNews(newsDTO, newsId);
         return new ResponseEntity<NewsDTO>(news, HttpStatus.OK);
     }
@@ -64,6 +79,12 @@ public class NewsController {
         return new ResponseEntity<List<NewsDTO>>(news, HttpStatus.OK);
     }
 
+    @GetMapping("/news/recommend")
+    public ResponseEntity<List<NewsDTO>> getNewsBySentiment() {
+        List<NewsDTO> news = this.iNewsService.getNewsBySentiment();
+        return new ResponseEntity<List<NewsDTO>>(news, HttpStatus.OK);
+    }
+
     //Get news by ID
     @GetMapping("/news/{newsId}")
     public ResponseEntity<NewsDTO> getNewsById(@PathVariable Integer newsId) {
@@ -72,12 +93,22 @@ public class NewsController {
     }
 
     //Get news by category
-//    @GetMapping("/news/category/{categoryId}")
-//    public ResponseEntity<List<NewsDTO>> getNewsByCategory(@PathVariable Integer categoryId)
-//    {
-//        List<NewsDTO> news = this.iNewsService.getNewsByCategory(categoryId);
-//        return new ResponseEntity<List<NewsDTO>>(news,HttpStatus.OK);
-//    }
+    @GetMapping("/news/category/{categoryId}")
+    public ResponseEntity<List<NewsDTO>> getNewsByCategory(@PathVariable Integer categoryId)
+    {
+        List<NewsDTO> news = this.iNewsService.getNewsByCategoryId(categoryId);
+        return new ResponseEntity<List<NewsDTO>>(news,HttpStatus.OK);
+    }
+
+    //Get news today
+    @GetMapping("/news/today")
+    public ResponseEntity<List<NewsDTO>> getNewsByToday()
+    {
+        LocalDate localDate = LocalDate.now();
+        Date date = Date.valueOf(localDate);
+        List<NewsDTO> news = this.iNewsService.getNewsByAddedDate(date);
+        return new ResponseEntity<List<NewsDTO>>(news,HttpStatus.OK);
+    }
 
     //Get news by user
     @GetMapping("/user/{userId}/news")
@@ -141,16 +172,15 @@ public class NewsController {
 
     @GetMapping("/images/{image}")
     public ResponseEntity<ByteArrayResource> getImage(@PathVariable("image") String image) {
-        if(!image.equals("")||image!=null){
-            try{
-                Path filename = Paths.get("images",image);
+        if (!image.equals("") || image != null) {
+            try {
+                Path filename = Paths.get("images", image);
                 byte[] buffer = Files.readAllBytes(filename);
                 ByteArrayResource byteArrayResource = new ByteArrayResource(buffer);
                 return ResponseEntity.ok().contentLength(buffer.length)
                         .contentType(MediaType.parseMediaType("image/jpg"))
                         .body(byteArrayResource);
-            }
-            catch (Exception e){
+            } catch (Exception e) {
                 e.printStackTrace();
             }
 

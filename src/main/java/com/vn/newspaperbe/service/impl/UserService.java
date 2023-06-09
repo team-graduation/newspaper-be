@@ -73,6 +73,7 @@ public class UserService implements IUserService {
     @Override
     public UserDTO getUserById(Integer id) {
         DAOUser user = this.iUserRepository.findDAOUserById(id);
+        
         return this.modelMapper.map(user, UserDTO.class);
     }
 

@@ -24,8 +24,6 @@ public class News
     @Column(nullable=false)
     private String title;
 
-    private String language;
-
     @Lob
     @Column(columnDefinition = "TEXT", nullable=false)
     private String content;
@@ -33,8 +31,6 @@ public class News
     @Lob
     @Column(columnDefinition = "TEXT")
     private String summarization;
-
-    private String image;
 
     private String thumbnail;
 

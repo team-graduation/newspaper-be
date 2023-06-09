@@ -16,7 +16,6 @@ public class NewsDTO {
 
     private String title;
 
-    private String language;
     private String sentiment;
 
     private String content;

@@ -8,4 +8,5 @@ import java.util.List;
 
 public interface ICategoryService extends IGeneralService<Category> {
     List<CategoryDTO> getAllCategories();
+
 }

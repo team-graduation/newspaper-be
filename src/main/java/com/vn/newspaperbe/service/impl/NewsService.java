@@ -16,8 +16,12 @@ import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.modelmapper.ModelMapper;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 
 import java.io.IOException;
+import java.time.LocalDate;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -55,6 +59,7 @@ public class NewsService implements INewsService {
 
     @Override
     public void delete(Integer id) {
+//        System.console(1);
         News news = this.iNewsRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("News", "Id", id));
         iNewsRepository.delete(news);
     }
@@ -63,14 +68,43 @@ public class NewsService implements INewsService {
     static String summaryValue = "";
     static String sentimentValue = "";
 
-    @Override
-    public NewsDTO createNews(NewsDTO newsDTO, Integer userId) {
-        DAOUser user = this.iUserRepository.findById(userId).orElseThrow(() -> new ResourceNotFoundException("User", "Id", userId));
+//    @Override
+//    public NewsDTO createNews(NewsDTO newsDTO, Integer userId) {
+//        DAOUser user = this.iUserRepository.findById(userId).orElseThrow(() -> new ResourceNotFoundException("User", "Id", userId));
+//
+//        News news = this.modelMapper.map(newsDTO, News.class);
+//        news.setImage("default.png");
+//        news.setAddedDate(new Date());
+//        news.setUser(user);
+//
+//        try {
+//            sendText(news.getContent());
+//            news.setCategory(iCategoryRepository.findByCategoryId(classifyValue));
+//            news.setSummarization(summaryValue);
+//            news.setSentiment(sentimentValue);
+//
+//        } catch (Exception e) {
+//            System.out.println(e);
+//        }
+//
+//        News savedNews = this.iNewsRepository.save(news);
+//        return this.modelMapper.map(news, NewsDTO.class);
+//    }
 
+    @Override
+    public NewsDTO createNews(NewsDTO newsDTO) {
         News news = this.modelMapper.map(newsDTO, News.class);
-        news.setImage("default.png");
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        Object principal = authentication.getPrincipal();
+
+        if (principal instanceof UserDetails) {
+            UserDetails userDetails = (UserDetails) principal;
+            String username = userDetails.getUsername();
+            DAOUser user = iUserRepository.findByUsername(username);
+            System.out.println(user);
+            news.setUser(user);
+        }
         news.setAddedDate(new Date());
-        news.setUser(user);
 
         try {
             sendText(news.getContent());
@@ -91,7 +125,7 @@ public class NewsService implements INewsService {
         News news = this.iNewsRepository.findById(newsId).orElseThrow(() -> new ResourceNotFoundException("News", "Id", newsId));
         news.setTitle(newsDTO.getTitle());
         news.setContent(newsDTO.getContent());
-        news.setImage(newsDTO.getImage());
+        news.setThumbnail(newsDTO.getThumbnail());
 
         News updatedPost = iNewsRepository.save(news);
 
@@ -106,10 +140,9 @@ public class NewsService implements INewsService {
     }
 
     @Override
-    public List<NewsDTO> getNewsByCategory(Category category) {
+    public List<NewsDTO> getNewsByCategoryId(Integer categoryId) {
         List<News> news = this.iNewsRepository.findNewsByCategory(
-                category
-//                iCategoryRepository.findByCategoryId(categoryId)
+                this.iCategoryRepository.findByCategoryId(categoryId)
         );
         List<NewsDTO> newsDTOS = news.stream().map((p) -> this.modelMapper.map(p, NewsDTO.class)).collect(Collectors.toList());
         return newsDTOS;
@@ -136,6 +169,20 @@ public class NewsService implements INewsService {
     @Override
     public List<NewsDTO> searchNews(String title) {
         List<News> news = this.iNewsRepository.findNewsByTitle(title);
+        List<NewsDTO> newsDTOS = news.stream().map((p) -> this.modelMapper.map(p, NewsDTO.class)).collect(Collectors.toList());
+        return newsDTOS;
+    }
+
+    @Override
+    public List<NewsDTO> getNewsBySentiment() {
+        List<News> news = this.iNewsRepository.findNewsBySentiment();
+        List<NewsDTO> newsDTOS = news.stream().map((p) -> this.modelMapper.map(p, NewsDTO.class)).collect(Collectors.toList());
+        return newsDTOS;
+    }
+
+    @Override
+    public List<NewsDTO> getNewsByAddedDate(Date today) {
+        List<News> news = this.iNewsRepository.findNewsByAddedDate(today);
         List<NewsDTO> newsDTOS = news.stream().map((p) -> this.modelMapper.map(p, NewsDTO.class)).collect(Collectors.toList());
         return newsDTOS;
     }

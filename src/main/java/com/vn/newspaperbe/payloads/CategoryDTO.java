@@ -15,8 +15,4 @@ public class CategoryDTO {
     @NotBlank
     @Size(min = 3,message = "Length of title should be minimum 3")
     private String categoryTitle;
-
-    @NotBlank
-    @Size(min = 10, message = "Length should be minimum 10")
-    private String categoryDescription;
 }
