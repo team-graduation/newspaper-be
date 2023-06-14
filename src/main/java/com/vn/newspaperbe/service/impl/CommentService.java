@@ -12,8 +12,12 @@ import com.vn.newspaperbe.repository.IUserRepository;
 import com.vn.newspaperbe.service.ICommentService;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
+import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -34,13 +38,32 @@ public class CommentService implements ICommentService {
         this.iUserRepository = iUserRepository;
     }
 
+//    @Override
+//    public CommentDTO createComment(CommentDTO commentDTO, Integer newsId, Integer userId) {
+//        News news = this.iNewsRepository.findById(newsId).orElseThrow(() -> new ResourceNotFoundException("News", "Id", newsId));
+//        DAOUser user = this.iUserRepository.findById(userId).orElseThrow(() -> new ResourceNotFoundException("User", "Id", userId));
+//        Comment comment = this.modelMapper.map(commentDTO, Comment.class);
+//        comment.setNews(news);
+//        comment.setUser(user);
+//        Comment savedComment = iCommentRepository.save(comment);
+//        return this.modelMapper.map(savedComment, CommentDTO.class);
+//    }
+
+    //test comment
     @Override
-    public CommentDTO createComment(CommentDTO commentDTO, Integer newsId, Integer userId) {
+    public CommentDTO createComment(CommentDTO commentDTO, Integer newsId) {
         News news = this.iNewsRepository.findById(newsId).orElseThrow(() -> new ResourceNotFoundException("News", "Id", newsId));
-        DAOUser user = this.iUserRepository.findById(userId).orElseThrow(() -> new ResourceNotFoundException("User", "Id", userId));
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        Object principal = authentication.getPrincipal();
         Comment comment = this.modelMapper.map(commentDTO, Comment.class);
+
+        if (principal instanceof UserDetails) {
+            UserDetails userDetails = (UserDetails) principal;
+            String username = userDetails.getUsername();
+            DAOUser user = iUserRepository.findByUsername(username);
+            comment.setUser(user);
+        }
         comment.setNews(news);
-        comment.setUser(user);
         Comment savedComment = iCommentRepository.save(comment);
         return this.modelMapper.map(savedComment, CommentDTO.class);
     }

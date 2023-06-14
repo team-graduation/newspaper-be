@@ -14,11 +14,16 @@ import java.util.List;
 
 @Repository
 public interface INewsRepository extends JpaRepository<News, Integer> {
+
+    List<News> findAllByStatus(Boolean status);
+
     List<News> findNewsByCategory(Category category);
 
     List<News> findNewsByUser(DAOUser user);
 
-    List<News> findNewsByTitle(String title);
+//    List<News> findNewsByTitle(String title);
+    @Query(value = "SELECT * FROM newspaper.news n WHERE n.title LIKE %:title%", nativeQuery = true)
+    List<News> findNewsByTitle(@Param("title") String title);
 
     News findByNewsId(Integer id);
 

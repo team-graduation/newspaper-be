@@ -42,15 +42,6 @@ public class CategoryController {
                 .orElseGet(() -> new ResponseEntity<>(HttpStatus.NOT_FOUND));
     }
 
-    @PutMapping("/{id}")
-    public ResponseEntity<Category> updateCategory(@PathVariable Integer id, @RequestBody Category category) {
-        Optional<Category> categoryOptional = categoryService.findById(id);
-        return categoryOptional.map(category1 -> {
-            category.setCategoryId(category1.getCategoryId());
-            return new ResponseEntity<>(categoryService.save(category), HttpStatus.OK);
-        }).orElseGet(() -> new ResponseEntity<>(HttpStatus.NOT_FOUND));
-    }
-
     @DeleteMapping("/{id}")
     public ResponseEntity<Category> deleteCategory(@PathVariable Integer id) {
         Optional<Category> categoryOptional = categoryService.findById(id);

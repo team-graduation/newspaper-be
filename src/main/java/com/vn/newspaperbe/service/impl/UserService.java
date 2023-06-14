@@ -1,8 +1,10 @@
 package com.vn.newspaperbe.service.impl;
 
+import com.vn.newspaperbe.entity.Comment;
 import com.vn.newspaperbe.entity.DAOUser;
 import com.vn.newspaperbe.entity.News;
 import com.vn.newspaperbe.exceptions.ResourceNotFoundException;
+import com.vn.newspaperbe.payloads.CommentDTO;
 import com.vn.newspaperbe.payloads.NewsDTO;
 import com.vn.newspaperbe.payloads.UserDTO;
 import com.vn.newspaperbe.repository.INewsRepository;
@@ -10,6 +12,9 @@ import com.vn.newspaperbe.repository.IUserRepository;
 import com.vn.newspaperbe.service.IUserService;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
 
@@ -34,6 +39,14 @@ public class UserService implements IUserService {
     }
 
     @Override
+    public UserDTO getProfile() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String currentPrincipalName = authentication.getName();
+        DAOUser daoUser = this.iUserRepository.findByUsername(currentPrincipalName);
+        return this.modelMapper.map(daoUser, UserDTO.class);
+    }
+
+    @Override
     public Iterable<DAOUser> findAll() {
         return null;
     }
@@ -51,7 +64,8 @@ public class UserService implements IUserService {
 
     @Override
     public void delete(Integer id) {
-
+        DAOUser daoUser = this.iUserRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("User", "Id", id));
+        iUserRepository.delete(daoUser);
     }
 
 //    @Override
@@ -73,7 +87,6 @@ public class UserService implements IUserService {
     @Override
     public UserDTO getUserById(Integer id) {
         DAOUser user = this.iUserRepository.findDAOUserById(id);
-        
         return this.modelMapper.map(user, UserDTO.class);
     }
 
@@ -81,7 +94,6 @@ public class UserService implements IUserService {
 //    public UserDTO findByUsername(String username) {
 //        return null;
 //    }
-
 
 
 }

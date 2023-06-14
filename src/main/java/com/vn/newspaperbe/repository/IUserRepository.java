@@ -10,5 +10,4 @@ import java.util.Optional;
 public interface IUserRepository extends JpaRepository<DAOUser, Integer> {
     DAOUser  findByUsername(String username);
     DAOUser findDAOUserById(Integer id);
-
 }

@@ -5,12 +5,10 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import javax.persistence.*;
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Entity
 @Table(name="users")
@@ -30,6 +28,15 @@ public class DAOUser implements UserDetails {
 
     @Column
     private String email;
+
+    @Column
+    private String experience;
+
+    @Column
+    private String phone;
+
+    @Column
+    private String website;
 
     @Column
     private String about;
@@ -72,9 +79,4 @@ public class DAOUser implements UserDetails {
         return false;
     }
 
-//    @Override
-//    public Collection<? extends GrantedAuthority> getAuthorities() {
-//        List<SimpleGrantedAuthority> authorities = this.roles.stream().map((role) -> new SimpleGrantedAuthority(role.getName())).collect(Collectors.toList());
-//        return authorities;
-//    }
 }

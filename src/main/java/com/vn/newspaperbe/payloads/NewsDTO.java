@@ -22,8 +22,6 @@ public class NewsDTO {
 
     private String summarization;
 
-    private String image;
-
     private String thumbnail;
 
     private Date addedDate;

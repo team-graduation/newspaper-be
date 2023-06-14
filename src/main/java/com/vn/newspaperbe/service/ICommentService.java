@@ -6,7 +6,7 @@ import com.vn.newspaperbe.payloads.CommentDTO;
 import java.util.List;
 
 public interface ICommentService {
-    CommentDTO createComment(CommentDTO commentDTO, Integer newsId, Integer userId);
+    CommentDTO createComment(CommentDTO commentDTO, Integer newsId);
 
     List<CommentDTO> getCommentByNewsId(Integer newsId);
 

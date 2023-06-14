@@ -30,10 +30,17 @@ public class CommentController {
         return new ResponseEntity<List<CommentDTO>>(comments,HttpStatus.OK);
     }
 
-    @PostMapping("/news/{newsId}/user/{userId}/comments")
-    public ResponseEntity<CommentDTO> createComment(@RequestBody CommentDTO comment, @PathVariable Integer newsId, @PathVariable Integer userId)
+//    @PostMapping("/news/{newsId}/user/{userId}/comments")
+//    public ResponseEntity<CommentDTO> createComment(@RequestBody CommentDTO comment, @PathVariable Integer newsId, @PathVariable Integer userId)
+//    {
+//        CommentDTO createComment = this.iCommentService.createComment(comment, newsId, userId);
+//        return new ResponseEntity<CommentDTO>(createComment, HttpStatus.CREATED);
+//    }
+
+    @PostMapping("/news/{newsId}/comments")
+    public ResponseEntity<CommentDTO> createComment(@RequestBody CommentDTO comment, @PathVariable Integer newsId)
     {
-        CommentDTO createComment = this.iCommentService.createComment(comment, newsId, userId);
+        CommentDTO createComment = this.iCommentService.createComment(comment, newsId);
         return new ResponseEntity<CommentDTO>(createComment, HttpStatus.CREATED);
     }
 

@@ -4,11 +4,13 @@ import com.vn.newspaperbe.entity.Category;
 import com.vn.newspaperbe.payloads.ApiResponse;
 import com.vn.newspaperbe.payloads.NewsDTO;
 import com.vn.newspaperbe.service.INewsService;
+import org.apache.tomcat.util.net.openssl.ciphers.Authentication;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -28,6 +30,8 @@ public class NewsController {
 
     @Autowired
     private INewsService iNewsService;
+
+
 
     //Create news
 //    @PostMapping("/user/{userId}/dh-news")
@@ -73,9 +77,15 @@ public class NewsController {
     }
 
     //Get all news
-    @GetMapping("/news")
+    @GetMapping("/admin/news")
     public ResponseEntity<List<NewsDTO>> getAllNews() {
         List<NewsDTO> news = this.iNewsService.getAllNews();
+        return new ResponseEntity<List<NewsDTO>>(news, HttpStatus.OK);
+    }
+
+    @GetMapping("/news")
+    public ResponseEntity<List<NewsDTO>> getAllNewsByStatus() {
+        List<NewsDTO> news = this.iNewsService.getAllNewsByStatus();
         return new ResponseEntity<List<NewsDTO>>(news, HttpStatus.OK);
     }
 
@@ -111,17 +121,11 @@ public class NewsController {
     }
 
     //Get news by user
-    @GetMapping("/user/{userId}/news")
-    public ResponseEntity<List<NewsDTO>> getNewsByUser(@PathVariable Integer userId) {
-        List<NewsDTO> news = this.iNewsService.getNewsByUsers(userId);
+    @GetMapping("/user/news")
+    public ResponseEntity<List<NewsDTO>> getNewsByUser() {
+        List<NewsDTO> news = this.iNewsService.getNewsByUsers();
         return new ResponseEntity<List<NewsDTO>>(news, HttpStatus.OK);
     }
-
-//    @GetMapping("/addDate}")
-//    public ResponseEntity<List<NewsDTO>> findNewsByAddedDate(){
-//        List<NewsDTO> news = this.iNewsService.findNewsByAddedDate();
-//        return new ResponseEntity<List<NewsDTO>>(news,HttpStatus.OK);
-//    }
 
     //Delete news
 //    @PreAuthorize("hasRole('ADMIN')")
@@ -131,8 +135,15 @@ public class NewsController {
         return new ResponseEntity<ApiResponse>(new ApiResponse("News deleted successfully", true), HttpStatus.OK);
     }
 
-    @GetMapping("/news/search/{title}")
-    public ResponseEntity<List<NewsDTO>> searchNewsByTitle(@PathVariable("title") String title) {
+    //Accept news
+    @GetMapping("/news/accept/{newsId}")
+    public  ResponseEntity<ApiResponse> acceptNews(@PathVariable Integer newsId) {
+        iNewsService.acceptNews(newsId);
+        return new ResponseEntity<ApiResponse>(new ApiResponse("Approve successfully.", true), HttpStatus.OK);
+    }
+
+    @GetMapping("/news/search")
+    public ResponseEntity<List<NewsDTO>> searchNewsByTitle(@RequestParam("title") String title) {
         List<NewsDTO> result = this.iNewsService.searchNews(title);
         return new ResponseEntity<List<NewsDTO>>(result, HttpStatus.OK);
     }

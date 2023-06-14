@@ -2,7 +2,6 @@ package com.vn.newspaperbe.service.impl;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.vn.newspaperbe.entity.Category;
 import com.vn.newspaperbe.entity.DAOUser;
 import com.vn.newspaperbe.entity.News;
 import com.vn.newspaperbe.exceptions.ResourceNotFoundException;
@@ -19,13 +18,14 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
-
 import java.io.IOException;
-import java.time.LocalDate;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
 
 @Service
 public class NewsService implements INewsService {
@@ -59,7 +59,6 @@ public class NewsService implements INewsService {
 
     @Override
     public void delete(Integer id) {
-//        System.console(1);
         News news = this.iNewsRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("News", "Id", id));
         iNewsRepository.delete(news);
     }
@@ -105,6 +104,7 @@ public class NewsService implements INewsService {
             news.setUser(user);
         }
         news.setAddedDate(new Date());
+        news.setStatus(false);
 
         try {
             sendText(news.getContent());
@@ -140,6 +140,14 @@ public class NewsService implements INewsService {
     }
 
     @Override
+    public List<NewsDTO> getAllNewsByStatus() {
+        List<News> news = this.iNewsRepository.findAllByStatus(true);
+        List<NewsDTO> newsDTOS = news.stream().map((p) -> this.modelMapper.map(p, NewsDTO.class)).collect(Collectors.toList());
+        return newsDTOS;
+    }
+
+
+    @Override
     public List<NewsDTO> getNewsByCategoryId(Integer categoryId) {
         List<News> news = this.iNewsRepository.findNewsByCategory(
                 this.iCategoryRepository.findByCategoryId(categoryId)
@@ -149,14 +157,14 @@ public class NewsService implements INewsService {
     }
 
     @Override
-    public List<NewsDTO> getNewsByUsers(Integer userId) {
-//        DAOUser user = this.iUserRepository.findById(userId).orElseThrow(() -> new ResourceNotFoundException("User", "Id", userId));
+    public List<NewsDTO> getNewsByUsers() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String currentPrincipalName = authentication.getName();
 
         List<News> news = this.iNewsRepository.findNewsByUser(
-                iUserRepository.findDAOUserById(userId)
+                iUserRepository.findByUsername(currentPrincipalName)
         );
         List<NewsDTO> newsDTOS = news.stream().map((p) -> this.modelMapper.map(p, NewsDTO.class)).collect(Collectors.toList());
-
         return newsDTOS;
     }
 
@@ -187,12 +195,22 @@ public class NewsService implements INewsService {
         return newsDTOS;
     }
 
+    @Override
+    public NewsDTO acceptNews(Integer newsId) {
+        News news = this.iNewsRepository.findById(newsId).orElseThrow(() -> new ResourceNotFoundException("News", "Id", newsId));
+        news.setStatus(true);
+        System.out.println(news.isStatus());
+        System.out.println(news);
+        return this.modelMapper.map(news, NewsDTO.class);
+    }
+
     public static void sendText(String t) throws IOException {
         RestTemplate restTemplate = new RestTemplate();
         String apiUrl = "http://157.245.192.252/api/receive-text";
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
-        String requestBody = t;
+//        String requestBody = t;
+        String requestBody = extractAllText(t);
         HttpEntity<String> requestEntity = new HttpEntity<>(requestBody, headers);
         ResponseEntity<String> responseEntity = restTemplate.exchange(apiUrl,
                 HttpMethod.POST,
@@ -211,6 +229,27 @@ public class NewsService implements INewsService {
             System.out.println("Gửi văn bản thất bại. Mã phản hồi: "
                     + responseEntity.getStatusCodeValue());
         }
+    }
+
+    public static String extractAllText(String html) {
+        Document doc = Jsoup.parse(html);
+
+        return getAllText(doc);
+    }
+
+    public static String getAllText(Element element) {
+        StringBuilder sb = new StringBuilder();
+
+        for (Element child : element.children()) {
+            sb.append(getAllText(child)).append(" ");
+        }
+
+        String ownText = element.ownText().trim();
+        if (!ownText.isEmpty()) {
+            sb.append(ownText).append(" ");
+        }
+
+        return sb.toString().trim();
     }
 
 }
