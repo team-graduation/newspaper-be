@@ -27,9 +27,9 @@ public interface INewsRepository extends JpaRepository<News, Integer> {
 
     News findByNewsId(Integer id);
 
-    @Query(value = "select * from newspaper.news n where n.sentiment = 'POSITIVE'", nativeQuery = true)
+    @Query(value = "select * from newspaper.news n where n.sentiment = 'POSITIVE' and n.status = 1", nativeQuery = true)
     List<News> findNewsBySentiment();
 
-    @Query(value = "SELECT * FROM newspaper.news n WHERE DATE(n.added_date) = :today", nativeQuery = true)
+    @Query(value = "SELECT * FROM newspaper.news n WHERE DATE(n.added_date) = :today and n.status = 1", nativeQuery = true)
     List<News> findNewsByAddedDate(@Param("today") Date today);
 }

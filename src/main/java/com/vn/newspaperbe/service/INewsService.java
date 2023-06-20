@@ -2,6 +2,7 @@ package com.vn.newspaperbe.service;
 
 import com.vn.newspaperbe.entity.News;
 import com.vn.newspaperbe.payloads.NewsDTO;
+import com.vn.newspaperbe.payloads.NewsResponse;
 
 import java.util.Date;
 import java.util.List;
@@ -28,4 +29,6 @@ public interface INewsService extends IGeneralService<News> {
     List<NewsDTO> getNewsByAddedDate(Date today);
 
     NewsDTO acceptNews(Integer newsId);
+
+    NewsResponse getAllNewsByPage(Integer pageNumber, Integer pageSize, String sortBy, String sortDir);
 }

@@ -50,7 +50,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         httpSecurity.cors();
         httpSecurity.csrf().disable()
                 .authorizeRequests().antMatchers("/api/login", "/api/register", "/api/auth/news",
-                        "/api/auth/images/*", "/api/auth/news/*", "/api/auth/categories/*", "/api/auth/categories", "/api/auth/news/category/*", "/api/auth/news/{{newsId}}/comments").permitAll().
+                        "/api/auth/images/*", "/api/auth/news/*", "/api/auth/categories/*", "/api/auth/categories", "/api/auth/news/category/*", "/api/auth/news/{{newsId}}/comments", "/news/{{newsId}}/comments").permitAll().
                         anyRequest().authenticated().and().
                         exceptionHandling().authenticationEntryPoint(jwtAuthenticationEntryPoint).and().sessionManagement()
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS);

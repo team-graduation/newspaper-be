@@ -2,13 +2,11 @@ package com.vn.newspaperbe.controller;
 
 import com.vn.newspaperbe.payloads.ApiResponse;
 import com.vn.newspaperbe.payloads.CommentDTO;
-import com.vn.newspaperbe.payloads.NewsDTO;
 import com.vn.newspaperbe.service.ICommentService;
 import com.vn.newspaperbe.service.INewsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -30,19 +28,13 @@ public class CommentController {
         return new ResponseEntity<List<CommentDTO>>(comments,HttpStatus.OK);
     }
 
-//    @PostMapping("/news/{newsId}/user/{userId}/comments")
-//    public ResponseEntity<CommentDTO> createComment(@RequestBody CommentDTO comment, @PathVariable Integer newsId, @PathVariable Integer userId)
-//    {
-//        CommentDTO createComment = this.iCommentService.createComment(comment, newsId, userId);
-//        return new ResponseEntity<CommentDTO>(createComment, HttpStatus.CREATED);
-//    }
-
     @PostMapping("/news/{newsId}/comments")
     public ResponseEntity<CommentDTO> createComment(@RequestBody CommentDTO comment, @PathVariable Integer newsId)
     {
         CommentDTO createComment = this.iCommentService.createComment(comment, newsId);
         return new ResponseEntity<CommentDTO>(createComment, HttpStatus.CREATED);
     }
+
 
     @PutMapping("/comments/{commentId}")
     public ResponseEntity<CommentDTO> updateComment(@RequestBody CommentDTO commentDTO, @PathVariable Integer commentId)

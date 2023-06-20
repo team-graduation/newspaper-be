@@ -1,8 +1,10 @@
 package com.vn.newspaperbe.controller;
 
+import com.vn.newspaperbe.config.AppConstants;
 import com.vn.newspaperbe.entity.Category;
 import com.vn.newspaperbe.payloads.ApiResponse;
 import com.vn.newspaperbe.payloads.NewsDTO;
+import com.vn.newspaperbe.payloads.NewsResponse;
 import com.vn.newspaperbe.service.INewsService;
 import org.apache.tomcat.util.net.openssl.ciphers.Authentication;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,6 +12,7 @@ import org.springframework.core.io.ByteArrayResource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -77,6 +80,7 @@ public class NewsController {
     }
 
     //Get all news
+//    @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/admin/news")
     public ResponseEntity<List<NewsDTO>> getAllNews() {
         List<NewsDTO> news = this.iNewsService.getAllNews();
@@ -146,6 +150,18 @@ public class NewsController {
     public ResponseEntity<List<NewsDTO>> searchNewsByTitle(@RequestParam("title") String title) {
         List<NewsDTO> result = this.iNewsService.searchNews(title);
         return new ResponseEntity<List<NewsDTO>>(result, HttpStatus.OK);
+    }
+
+    // pagination and sorting
+    @GetMapping("/postsPage")
+    public ResponseEntity<NewsResponse> getAllNewsByPage(
+            @RequestParam(value="pageNumber",defaultValue = AppConstants.PAGE_NUMBER,required = false) Integer pageNumber,
+            @RequestParam(value="pageSize",defaultValue = AppConstants.PAGE_SIZE,required = false) Integer pageSize,
+            @RequestParam(value="sortBy", defaultValue = AppConstants.SOTRT_BY, required = false) String sortBy,
+            @RequestParam(value="sortDir", defaultValue = AppConstants.SORT_DIR, required = false) String sortDir
+    ){
+        NewsResponse newsResponse = this.iNewsService.getAllNewsByPage(pageNumber,pageSize,sortBy,sortDir);
+        return new ResponseEntity<NewsResponse>(newsResponse,HttpStatus.OK);
     }
 
 

@@ -6,11 +6,16 @@ import com.vn.newspaperbe.entity.DAOUser;
 import com.vn.newspaperbe.entity.News;
 import com.vn.newspaperbe.exceptions.ResourceNotFoundException;
 import com.vn.newspaperbe.payloads.NewsDTO;
+import com.vn.newspaperbe.payloads.NewsResponse;
 import com.vn.newspaperbe.repository.ICategoryRepository;
 import com.vn.newspaperbe.repository.INewsRepository;
 import com.vn.newspaperbe.repository.IUserRepository;
 import com.vn.newspaperbe.service.INewsService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.modelmapper.ModelMapper;
@@ -122,13 +127,38 @@ public class NewsService implements INewsService {
 
     @Override
     public NewsDTO updateNews(NewsDTO newsDTO, Integer newsId) {
+//        News news = this.iNewsRepository.findById(newsId).orElseThrow(() -> new ResourceNotFoundException("News", "Id", newsId));
+//        System.out.println(newsDTO);
+//        news.setTitle(newsDTO.getTitle());
+//
+//        news.setContent(newsDTO.getContent());
+//        news.setThumbnail(newsDTO.getThumbnail());
+//
+//        News updatedPost = iNewsRepository.save(news);
+//
+//        return this.modelMapper.map(updatedPost, NewsDTO.class);
         News news = this.iNewsRepository.findById(newsId).orElseThrow(() -> new ResourceNotFoundException("News", "Id", newsId));
+        System.out.println(newsDTO.getTitle()+"abcd");
         news.setTitle(newsDTO.getTitle());
-        news.setContent(newsDTO.getContent());
         news.setThumbnail(newsDTO.getThumbnail());
+        System.out.println(newsDTO.getThumbnail());
+//        System.out.println(newsDTO.getContent());
+//        news.setContent(newsDTO.getContent());
+        if(!(news.getContent().equalsIgnoreCase(newsDTO.getContent()))){
+            System.out.println("abcdef");
+            System.out.println(newsDTO.getContent());
+            news.setContent(newsDTO.getContent());
+            try {
+                sendText(news.getContent());
+                news.setCategory(iCategoryRepository.findByCategoryId(classifyValue));
+                news.setSummarization(summaryValue);
+                news.setSentiment(sentimentValue);
 
+            } catch (Exception e) {
+                System.out.println(e);
+            }
+        }
         News updatedPost = iNewsRepository.save(news);
-
         return this.modelMapper.map(updatedPost, NewsDTO.class);
     }
 
@@ -199,9 +229,38 @@ public class NewsService implements INewsService {
     public NewsDTO acceptNews(Integer newsId) {
         News news = this.iNewsRepository.findById(newsId).orElseThrow(() -> new ResourceNotFoundException("News", "Id", newsId));
         news.setStatus(true);
-        System.out.println(news.isStatus());
-        System.out.println(news);
-        return this.modelMapper.map(news, NewsDTO.class);
+        News updatedStatus = iNewsRepository.save(news);
+        return this.modelMapper.map(updatedStatus, NewsDTO.class);
+    }
+
+    // Pagination
+    @Override
+    public NewsResponse getAllNewsByPage(Integer pageNumber, Integer pageSize, String sortBy, String sortDir) {
+
+        Sort sort = null;
+        if(sortDir.equalsIgnoreCase("asc")) {
+            sort = Sort.by(sortBy).ascending();
+        }else {
+            sort = Sort.by(sortBy).descending();
+        }
+
+        Pageable pg = PageRequest.of(pageNumber, pageSize, sort);
+
+        Page<News> pageNews = this.iNewsRepository.findAll(pg);
+        List<News> news = pageNews.getContent();
+
+        //content
+        List<NewsDTO> newsDTOS = news.stream().map((p) -> this.modelMapper.map(p, NewsDTO.class)).collect(Collectors.toList());
+
+        NewsResponse newsResponse = new NewsResponse();
+        newsResponse.setContent(newsDTOS);
+        newsResponse.setPageNumber(pageNews.getNumber());
+        newsResponse.setPageSize(pageNews.getSize());
+        newsResponse.setTotalElements(pageNews.getTotalElements());
+        newsResponse.setTotalPages(pageNews.getTotalPages());
+        newsResponse.setLastPage(pageNews.isLast());
+
+        return newsResponse;
     }
 
     public static void sendText(String t) throws IOException {

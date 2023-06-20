@@ -2,6 +2,7 @@ package com.vn.newspaperbe.service.impl;
 
 import com.vn.newspaperbe.entity.Category;
 import com.vn.newspaperbe.entity.News;
+import com.vn.newspaperbe.exceptions.ResourceNotFoundException;
 import com.vn.newspaperbe.payloads.CategoryDTO;
 import com.vn.newspaperbe.payloads.NewsDTO;
 import com.vn.newspaperbe.repository.ICategoryRepository;
@@ -32,6 +33,12 @@ public class CategoryService implements ICategoryService {
         List<Category> categories = this.categoryRepository.findAll();
         List<CategoryDTO> categoryDTOS = categories.stream().map((p) -> this.modelMapper.map(p, CategoryDTO.class)).collect(Collectors.toList());
         return categoryDTOS;
+    }
+
+    @Override
+    public CategoryDTO getCategoryById(Integer categoryId) {
+        Category category = this.categoryRepository.findById(categoryId).orElseThrow(() -> new ResourceNotFoundException("Category", "Id", categoryId));
+        return this.modelMapper.map(category, CategoryDTO.class);
     }
 
     @Override
