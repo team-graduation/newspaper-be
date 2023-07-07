@@ -49,7 +49,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     protected void configure(HttpSecurity httpSecurity) throws Exception {
         httpSecurity.cors();
         httpSecurity.csrf().disable()
-                .authorizeRequests().antMatchers("/api/login", "/api/register", "/api/auth/news",
+                .authorizeRequests().antMatchers("/api/login", "/api/register", "/api/auth/news","/api/html",
                         "/api/auth/images/*", "/api/auth/news/*", "/api/auth/categories/*", "/api/auth/categories", "/api/auth/news/category/*", "/api/auth/news/{{newsId}}/comments", "/news/{{newsId}}/comments").permitAll().
                         anyRequest().authenticated().and().
                         exceptionHandling().authenticationEntryPoint(jwtAuthenticationEntryPoint).and().sessionManagement()

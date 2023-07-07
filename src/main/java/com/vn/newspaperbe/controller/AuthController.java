@@ -9,6 +9,7 @@ import com.vn.newspaperbe.service.INewsService;
 import com.vn.newspaperbe.service.IUserService;
 import com.vn.newspaperbe.service.impl.JwtUserDetailsService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -64,5 +65,14 @@ public class AuthController {
         } catch (BadCredentialsException e) {
             throw new Exception("INVALID_CREDENTIALS", e);
         }
+    }
+
+
+    @GetMapping("/html")
+    public ResponseEntity<String> getHtmlString() {
+        String htmlString = "<html><body><h1>Hello, World!</h1></body></html>";
+        return ResponseEntity.ok()
+                .contentType(MediaType.TEXT_HTML)
+                .body(htmlString);
     }
 }
